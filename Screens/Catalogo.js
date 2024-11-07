@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
-import { db } from '../Bd/firebaseconfig'; 
+import { View, Text, FlatList, Image, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { db } from '../Bd/firebaseconfig';
 import { collection, getDocs } from 'firebase/firestore';
-
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons'; // Asegúrate de tener este paquete instalado
 
 const Catalogo = () => {
-  const [zapatos, setZapatos] = useState([]); // Estado para almacenar la lista de zapatos
+  const [zapatos, setZapatos] = useState([]);
+  const navigation = useNavigation(); // Hook para la navegación
 
   useEffect(() => {
-    // Función para cargar los datos de Firestore
     const obtenerZapatos = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'catalogo')); // Asegúrate de que la colección se llama 'catalogo'
+        const querySnapshot = await getDocs(collection(db, 'catalogo'));
         const listaZapatos = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setZapatos(listaZapatos); // Almacena los datos en el estado
+        setZapatos(listaZapatos);
       } catch (error) {
         console.error('Error al obtener los zapatos: ', error);
       }
@@ -45,6 +46,14 @@ const Catalogo = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.lista}
       />
+
+      {/* Botón circular flotante */}
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => navigation.navigate('FormularioZapato')} // Navega a FormularioZapato
+      >
+        <Icon name="add-circle" size={60} color="#007bff" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -105,5 +114,11 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 8,
     textAlign: 'center',
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    elevation: 5,
   },
 });
