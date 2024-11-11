@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const Catalogo = () => {
   const [zapatos, setZapatos] = useState([]);
-  const [selectedZapato, setSelectedZapato] = useState(null); // Para almacenar el zapato en edición
+  const [selectedZapato, setSelectedZapato] = useState(null);
   const [marca, setMarca] = useState('');
   const [categoria, setCategoria] = useState('');
   const [precio, setPrecio] = useState('');
@@ -31,16 +31,14 @@ const Catalogo = () => {
     }
   };
 
-  // Función para seleccionar un zapato para actualizar
   const seleccionarZapatoParaActualizar = (zapato) => {
     setSelectedZapato(zapato.id);
     setMarca(zapato.marca);
     setCategoria(zapato.categoria);
-    setPrecio(String(zapato.precio)); // Convierte el precio a string para el TextInput
+    setPrecio(String(zapato.precio));
     setTallaZapato(zapato.tallaZapato);
   };
 
-  // Función para actualizar el zapato
   const actualizarZapato = async () => {
     if (marca && categoria && precio && tallaZapato) {
       try {
@@ -54,7 +52,7 @@ const Catalogo = () => {
 
         Alert.alert('Zapato actualizado', 'El zapato se ha actualizado correctamente.');
         resetForm();
-        obtenerZapatos(); // Recargar los zapatos actualizados
+        obtenerZapatos();
       } catch (error) {
         console.error('Error al actualizar el zapato:', error);
         Alert.alert('Error', 'No se pudo actualizar el zapato. Intenta nuevamente.');
@@ -64,19 +62,17 @@ const Catalogo = () => {
     }
   };
 
-  // Función para eliminar un zapato
   const eliminarZapato = async (id) => {
     try {
       await deleteDoc(doc(db, 'catalogo', id));
       Alert.alert('Zapato eliminado', 'El zapato se ha eliminado correctamente.');
-      obtenerZapatos(); // Recargar los zapatos después de eliminar
+      obtenerZapatos();
     } catch (error) {
       console.error('Error al eliminar el zapato:', error);
       Alert.alert('Error', 'No se pudo eliminar el zapato. Intenta nuevamente.');
     }
   };
 
-  // Función para resetear el formulario
   const resetForm = () => {
     setSelectedZapato(null);
     setMarca('');
@@ -88,26 +84,22 @@ const Catalogo = () => {
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Image source={{ uri: item.imagen }} style={styles.imagen} />
-      <Text style={styles.marca}>Marca: {item.marca}</Text>
+      <Text style={styles.marca}>{item.marca}</Text>
       <Text style={styles.categoria}>Categoría: {item.categoria}</Text>
-      <Text style={styles.precio}>Precio: ${item.precio}</Text>
+      <Text style={styles.precio}>${item.precio}</Text>
       <Text style={styles.talla}>Talla: {item.tallaZapato}</Text>
-      
-      {/* Botones para eliminar y actualizar */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
           onPress={() => eliminarZapato(item.id)}
         >
           <Icon name="trash" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Eliminar</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.updateButton]}
           onPress={() => seleccionarZapatoParaActualizar(item)}
         >
           <Icon name="pencil" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Actualizar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -116,7 +108,6 @@ const Catalogo = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Catálogo de Zapatos</Text>
-
       {selectedZapato && (
         <View style={styles.formContainer}>
           <Text style={styles.formTitle}>Actualizar Zapato</Text>
@@ -145,7 +136,6 @@ const Catalogo = () => {
             value={tallaZapato}
             onChangeText={setTallaZapato}
           />
-          
           <View style={styles.formButtonContainer}>
             <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={actualizarZapato}>
               <Icon name="checkmark-circle-outline" size={20} color="#fff" />
@@ -158,15 +148,12 @@ const Catalogo = () => {
           </View>
         </View>
       )}
-
       <FlatList
         data={zapatos}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.lista}
       />
-
-      {/* Botón circular flotante para agregar un nuevo zapato */}
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => navigation.navigate('FormularioZapato')}
@@ -183,48 +170,64 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#FFF',
+    backgroundColor: '#f8f9fa',
   },
   titulo: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   lista: {
     paddingBottom: 16,
   },
   itemContainer: {
-    backgroundColor: '#F0F0F0',
-    borderRadius: 10,
+    backgroundColor: '#FFF',
+    borderRadius: 15,
     padding: 16,
     marginBottom: 16,
     alignItems: 'center',
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
   },
   imagen: {
-    width: 150,
-    height: 150,
+    width: '95%',
+    height: 160,
     resizeMode: 'cover',
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 10,
+  },
+  marca: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 4,
+  },
+  categoria: {
+    fontSize: 14,
+    color: '#7f8c8d',
+  },
+  precio: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#e74c3c',
+  },
+  talla: {
+    fontSize: 16,
+    color: '#34495e',
+    marginTop: 4,
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 12,
   },
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 5,
     padding: 10,
-    flex: 1,
-    justifyContent: 'center',
+    borderRadius: 8,
     marginHorizontal: 5,
   },
   deleteButton: {
@@ -239,37 +242,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   formContainer: {
-    padding: 16,
+    padding: 20,
     backgroundColor: '#FFF',
-    borderRadius: 10,
-    marginBottom: 16,
+    borderRadius: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
+    marginBottom: 20,
   },
   formTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 16,
+    color: '#333',
   },
   input: {
-    height: 40,
-    borderColor: '#ccc',
+    height: 45,
+    borderColor: '#dcdcdc',
     borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingLeft: 10,
+    borderRadius: 8,
+    marginBottom: 12,
+    paddingLeft: 12,
   },
   formButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   saveButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#2ecc71',
   },
   cancelButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: '#e74c3c',
   },
   floatingButton: {
     position: 'absolute',
