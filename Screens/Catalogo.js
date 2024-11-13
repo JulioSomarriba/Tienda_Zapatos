@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { db } from '../Bd/firebaseconfig';
-import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -15,20 +15,23 @@ const Catalogo = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    obtenerZapatos();
+    // Llama a la función para suscribirse a los cambios en la colección
+    const unsubscribe = obtenerZapatosTiempoReal();
+    
+    // Limpia la suscripción al desmontar el componente
+    return () => unsubscribe();
   }, []);
 
-  const obtenerZapatos = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'catalogo'));
-      const listaZapatos = querySnapshot.docs.map((doc) => ({
+  // Configura un listener en tiempo real en la colección 'catalogo'
+  const obtenerZapatosTiempoReal = () => {
+    const zapatosRef = collection(db, 'catalogo');
+    return onSnapshot(zapatosRef, (snapshot) => {
+      const listaZapatos = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setZapatos(listaZapatos);
-    } catch (error) {
-      console.error('Error al obtener los zapatos: ', error);
-    }
+    });
   };
 
   const seleccionarZapatoParaActualizar = (zapato) => {
@@ -52,7 +55,6 @@ const Catalogo = () => {
 
         Alert.alert('Zapato actualizado', 'El zapato se ha actualizado correctamente.');
         resetForm();
-        obtenerZapatos();
       } catch (error) {
         console.error('Error al actualizar el zapato:', error);
         Alert.alert('Error', 'No se pudo actualizar el zapato. Intenta nuevamente.');
@@ -63,14 +65,30 @@ const Catalogo = () => {
   };
 
   const eliminarZapato = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'catalogo', id));
-      Alert.alert('Zapato eliminado', 'El zapato se ha eliminado correctamente.');
-      obtenerZapatos();
-    } catch (error) {
-      console.error('Error al eliminar el zapato:', error);
-      Alert.alert('Error', 'No se pudo eliminar el zapato. Intenta nuevamente.');
-    }
+    Alert.alert(
+      'Confirmación de Eliminación',
+      '¿Estás seguro de que deseas eliminar este zapato del catálogo?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => console.log('Eliminación cancelada'),
+          style: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, 'catalogo', id));
+              Alert.alert('Zapato eliminado', 'El zapato se ha eliminado correctamente.');
+            } catch (error) {
+              console.error('Error al eliminar el zapato:', error);
+              Alert.alert('Error', 'No se pudo eliminar el zapato. Intenta nuevamente.');
+            }
+          },
+          style: 'destructive',
+        },
+      ]
+    );
   };
 
   const resetForm = () => {

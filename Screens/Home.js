@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import Catalogo from './Catalogo';
 
+
 const Home = () => {
 
     return (
