@@ -127,11 +127,11 @@ const Estadistica = () => {
             color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           }}
           style={styles.chart}
-        />
-        <View style={styles.button}>
+        />     
+      </View>
+      <View style={styles.button}>
           <Button title="Generar PDF del Gráfico de Barras" onPress={generarPDFBarChart} />
         </View>
-      </View>
 
       <View ref={pieChartRef} collapsable={false} style={styles.chartContainer}>
         <PieChart
@@ -152,11 +152,11 @@ const Estadistica = () => {
           paddingLeft="15"
           absolute
           style={styles.chart}
-        />
-        <View style={styles.button}>
+        />      
+      </View>
+      <View style={styles.button}>
           <Button title="Generar PDF del Gráfico Circular" onPress={generarPDFPieChart} />
         </View>
-      </View>
     </View>
   );
 };
